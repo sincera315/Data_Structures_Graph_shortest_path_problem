@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-//logic: Grid(double pointer calling) --> GraphNode(single pointer calling) --> ListNode(Node is formed here)
+
+// Logic: Grid(double pointer calling) --> GraphNode(single pointer calling) --> ListNode(Node is formed here)
 
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
@@ -20,7 +21,7 @@ public:
     int id;
     ListNode* head;
 
-    GraphNode(int nodeId) : id(nodeId), head(NULL) {}// MIL(Member Initialization List.)
+    GraphNode(int nodeId) : id(nodeId), head(NULL) {}
 
     // it will help to add edges to each node by using a linked list connection method(next ptr).
     void addEdge(int to) 
@@ -51,7 +52,6 @@ public:
 
     Grid(int n) : size(n) 
     {
-        //creating 2D array of nodes using Graph nodes double pointer method.
         nodes = new GraphNode * [n * n];
         for (int i = 0; i < n * n; i++) 
         {
@@ -59,7 +59,7 @@ public:
         }
     }
 
-    //destructor to deallocater memory more efficiently and correctly.
+    //Destructor so that all the allocated memory could be released after use and prevents errors or memory leakages.
     ~Grid() 
     {
         for (int i = 0; i < size * size; i++) 
@@ -78,42 +78,40 @@ public:
         }
     }
 
-    void printConnections() 
+    void printConnections(ostream& out) 
     {
         for (int i = 0; i < size * size; i++) 
         {
-            cout << "Node " << nodes[i]->id << " connects to: ";
+            out << "Node " << nodes[i]->id << " connects to: ";
             ListNode* current = nodes[i]->head;
             while (current != NULL) 
             {
-                cout << current->id << " ";
+                out << current->id << " ";
                 current = current->next;
             }
-            cout << endl;
+            out << endl;
         }
     }
 
-    // print in a more graph format.
-    void printVisualGrid() 
+    void printVisualGrid(ostream& out)
     {
         for (int i = 0; i < size; i++) 
         {
             for (int j = 0; j < size; j++) 
             {
-                cout << (i * size + j) ;
-                //for printing connection lines in between nodes.
-                if (j != size - 1)
+                out << (i * size + j);
+                //it is to display the link more visibly for horizontal
+                if (j != size - 1) 
                 {
-                    cout << "   --   ";
+                    out << "   --   ";
                 }
             }
-            cout << endl;
-            //for printing connection lines vertically between nodes.
-            if (i != size - 1)
+            out << endl;
+            // for vertical connections.
+            if (i != size - 1) 
             {
-                cout << "|" << "\t" << " |" << "\t" << "  |" << endl;
+                out << "|" << "\t" << " |" << "\t" << "  |" << endl;
             }
-            
         }
     }
 };
@@ -121,26 +119,21 @@ public:
 void saveGridToFile(int n, Grid& cityGrid) 
 {
     ofstream outFile("project1.txt");
-    if (!outFile.is_open()) {
+    if (!outFile.is_open()) 
+    {
         cerr << "Error: Unable to open output file." << endl;
         exit(1);
     }
 
-    // Write grid size
     outFile << "Grid Size: " << n << " x " << n << endl << endl;
-
-    // Write visual grid layout
     outFile << "Visual Grid Layout (Node Indices):" << endl;
     cityGrid.printVisualGrid(outFile);
     outFile << endl;
-
-    // Write node connections
     outFile << "Node Connections:" << endl;
     cityGrid.printConnections(outFile);
 
     outFile.close();
 }
-
 
 int main() 
 {
@@ -148,8 +141,7 @@ int main()
     cout << "Enter the grid size (N x N): ";
     cin >> n;
 
-    if (cin.fail() || n <= 0) 
-    {
+    if (cin.fail() || n <= 0) {
         cerr << "Invalid input: Grid size must be a positive integer." << endl;
         return 1;
     }
@@ -167,15 +159,12 @@ int main()
     }
 
     cout << "Visual Grid Layout (Node Indices):" << endl;
-    cityGrid.printVisualGrid();
+    cityGrid.printVisualGrid(cout);
 
-    cout << endl<<"Node Connections:" << endl;
-    cityGrid.printConnections();
+    cout << endl << "Node Connections:" << endl;
+    cityGrid.printConnections(cout);
 
-    // Save grid data to file
     saveGridToFile(n, cityGrid);
+
     return 0;
 }
-
-
-
