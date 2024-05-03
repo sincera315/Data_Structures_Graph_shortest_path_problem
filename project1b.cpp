@@ -3,6 +3,10 @@
 using namespace std;
 
 // Logic: Grid(double pointer calling) --> GraphNode(single pointer calling) --> ListNode(Node is formed here)
+// Now left work is :
+//Implement Dijkstra's Algorithm: Write a function to implement Dijkstra's algorithm to find the shortest path from a given source node to all other nodes in the grid.
+//Modify Grid Class : Add a method to get the shortest path from a source node to a destination node based on the output of Dijkstra's algorithm.
+//Update Main Function : Call the Dijkstra function to find the shortest path, and then print or save the shortest path to the output file.
 
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
