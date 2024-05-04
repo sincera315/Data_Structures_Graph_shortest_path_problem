@@ -11,7 +11,7 @@ using namespace std;
 
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
-class ListNode 
+class ListNode
 {
 public:
     int id;
@@ -20,7 +20,7 @@ public:
 };
 
 // it is the function which will help to create a graph using the node class and adding their nodes by connecting them to several other nodes.
-class GraphNode 
+class GraphNode
 {
 public:
     int id;
@@ -29,7 +29,7 @@ public:
     GraphNode(int nodeId) : id(nodeId), head(NULL) {}
 
     // it will help to add edges to each node by using a linked list connection method(next ptr).
-    void addEdge(int to) 
+    void addEdge(int to)
     {
         ListNode* newNode = new ListNode(to);
         newNode->next = head;
@@ -37,10 +37,10 @@ public:
     }
 
     //Destructor so that all the allocated memory could be released after use and prevents errors or memory leakages.
-    ~GraphNode() 
+    ~GraphNode()
     {
         ListNode* current = head;
-        while (current != NULL) 
+        while (current != NULL)
         {
             ListNode* temp = current;
             current = current->next;
@@ -49,7 +49,7 @@ public:
     }
 };
 
-class Grid 
+class Grid
 {
 public:
     int size;
@@ -57,12 +57,12 @@ public:
     int** adjacencyList;  // 2D array to store adjacency list
 
     // Constructor
-    Grid(int n) : size(n) 
+    Grid(int n) : size(n)
     {
         // Allocate memory for nodes and adjacency list
         nodes = new GraphNode * [n * n];
-        adjacencyList = new int*[n * n];
-        for (int i = 0; i < n * n; i++) 
+        adjacencyList = new int* [n * n];
+        for (int i = 0; i < n * n; i++)
         {
             nodes[i] = new GraphNode(i);
             adjacencyList[i] = new int[n * n];
@@ -75,10 +75,10 @@ public:
     }
 
     // Destructor
-    ~Grid() 
+    ~Grid()
     {
         // Deallocate memory for nodes and adjacency list
-        for (int i = 0; i < size * size; i++) 
+        for (int i = 0; i < size * size; i++)
         {
             delete nodes[i];
             delete[] adjacencyList[i];
@@ -88,9 +88,9 @@ public:
     }
 
     // Add edge between two nodes
-    void addEdge(int from, int to) 
+    void addEdge(int from, int to)
     {
-        if (from >= 0 && from < size * size && to >= 0 && to < size * size) 
+        if (from >= 0 && from < size * size && to >= 0 && to < size * size)
         {
             // Add edge to graph nodes
             nodes[from]->addEdge(to);
@@ -102,15 +102,15 @@ public:
     }
 
     // Print adjacency list (for debugging)
-    void printAdjacencyList() 
+    void printAdjacencyList()
     {
         cout << "Adjacency List:" << endl;
-        for (int i = 0; i < size * size; ++i) 
+        for (int i = 0; i < size * size; ++i)
         {
             cout << "Node " << i << " connects to:";
-            for (int j = 0; j < size * size; ++j) 
+            for (int j = 0; j < size * size; ++j)
             {
-                if (adjacencyList[i][j] == 1) 
+                if (adjacencyList[i][j] == 1)
                 {
                     cout << j << " ";
                 }
@@ -120,13 +120,13 @@ public:
     }
 
     // Print connections of each node (for debugging)
-    void printConnections() 
+    void printConnections()
     {
-        for (int i = 0; i < size * size; i++) 
+        for (int i = 0; i < size * size; i++)
         {
             cout << "Node " << nodes[i]->id << " connects to: ";
             ListNode* current = nodes[i]->head;
-            while (current != NULL) 
+            while (current != NULL)
             {
                 cout << current->id << " ";
                 current = current->next;
@@ -138,22 +138,34 @@ public:
     // Print visual grid layout (for debugging)
     void printVisualGrid()
     {
-        for (int i = 0; i < size; i++) 
+        for (int i = 0; i < size; i++)
         {
-            for (int j = 0; j < size; j++) 
+            for (int j = 0; j < size; j++)
             {
                 cout << (i * size + j);
                 //it is to display the link more visibly for horizontal
-                if (j != size - 1) 
+                if (j != size - 1)
                 {
-                    cout << "   --   ";
+                    if (j > 9)
+                    {
+                        cout << "--";
+                    }
+                    else 
+                    {
+                        cout << "   --   ";
+                    }
                 }
+                
             }
             cout << endl;
             // for vertical connections.
-            if (i != size - 1) 
+            if (i != size - 1)
             {
-                cout << "|" << "\t" << " |" << "\t" << "  |" << endl;
+                for (int k = 0; k < size; k++)
+                {
+                    cout << "|" << "\t";
+                }
+                cout << endl;
             }
         }
     }
@@ -170,7 +182,7 @@ void writeDataToFile() {
     file << T << "\n";
 
     for (int i = 0; i < T; ++i) {
-        cout << "Test Case " << i+1 << ":" << endl;
+        cout << "Test Case " << i + 1 << ":" << endl;
         cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
         cin >> N >> I >> R;
         file << N << " " << I << " " << R << "\n";
@@ -200,7 +212,7 @@ void writeDataToFile() {
 
 
         for (int j = 0; j < R; ++j) {
-            cout << "Restaurant " << j+1 << ":" << endl;
+            cout << "Restaurant " << j + 1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
             cin.ignore(); // Clears the input buffer
             getline(cin, restaurantName);
@@ -208,7 +220,7 @@ void writeDataToFile() {
             file << restaurantName << " " << location << " " << O << "\n";
 
             for (int k = 0; k < O; ++k) {
-                cout << "Order " << k+1 << ":" << endl;
+                cout << "Order " << k + 1 << ":" << endl;
                 cout << "Enter order name, order location, and delivery time limit: ";
                 cin.ignore(); // Clears the input buffer
                 getline(cin, orderName);
@@ -224,7 +236,7 @@ void writeDataToFile() {
 
 
 
-int main() 
+int main()
 {
 
     int choice;
@@ -235,15 +247,15 @@ int main()
     cin >> choice;
 
     switch (choice) {
-        case 1:
-            writeDataToFile();
-            break;
-        case 2:
-            cout << "Exiting program.\n";
-            return 0;
-        default:
-            cout << "Invalid choice.\n";
-            return 1;
+    case 1:
+        writeDataToFile();
+        break;
+    case 2:
+        cout << "Exiting program.\n";
+        return 0;
+    default:
+        cout << "Invalid choice.\n";
+        return 1;
     }
     return 0;
 }
