@@ -54,92 +54,112 @@ class Grid
 public:
     int size;
     GraphNode** nodes;
+    int** adjacencyList;  // 2D array to store adjacency list
 
+    // Constructor
     Grid(int n) : size(n) 
     {
+        // Allocate memory for nodes and adjacency list
         nodes = new GraphNode * [n * n];
+        adjacencyList = new int*[n * n];
         for (int i = 0; i < n * n; i++) 
         {
             nodes[i] = new GraphNode(i);
+            adjacencyList[i] = new int[n * n];
+            // Initialize adjacency list to 0
+            for (int j = 0; j < n * n; j++)
+            {
+                adjacencyList[i][j] = 0;  // Initialize all values to 0
+            }
         }
     }
 
-    //Destructor so that all the allocated memory could be released after use and prevents errors or memory leakages.
+    // Destructor
     ~Grid() 
     {
+        // Deallocate memory for nodes and adjacency list
         for (int i = 0; i < size * size; i++) 
         {
             delete nodes[i];
+            delete[] adjacencyList[i];
         }
         delete[] nodes;
+        delete[] adjacencyList;
     }
 
+    // Add edge between two nodes
     void addEdge(int from, int to) 
     {
         if (from >= 0 && from < size * size && to >= 0 && to < size * size) 
         {
+            // Add edge to graph nodes
             nodes[from]->addEdge(to);
             nodes[to]->addEdge(from);
+            // Update adjacency list
+            adjacencyList[from][to] = 1;
+            adjacencyList[to][from] = 1;
         }
     }
 
-    void printConnections(ostream& out) 
+    // Print adjacency list (for debugging)
+    void printAdjacencyList() 
+    {
+        cout << "Adjacency List:" << endl;
+        for (int i = 0; i < size * size; ++i) 
+        {
+            cout << "Node " << i << " connects to:";
+            for (int j = 0; j < size * size; ++j) 
+            {
+                if (adjacencyList[i][j] == 1) 
+                {
+                    cout << j << " ";
+                }
+            }
+            cout << endl;
+        }
+    }
+
+    // Print connections of each node (for debugging)
+    void printConnections() 
     {
         for (int i = 0; i < size * size; i++) 
         {
-            out << "Node " << nodes[i]->id << " connects to: ";
+            cout << "Node " << nodes[i]->id << " connects to: ";
             ListNode* current = nodes[i]->head;
             while (current != NULL) 
             {
-                out << current->id << " ";
+                cout << current->id << " ";
                 current = current->next;
             }
-            out << endl;
+            cout << endl;
         }
     }
 
-    void printVisualGrid(ostream& out)
+    // Print visual grid layout (for debugging)
+    void printVisualGrid()
     {
         for (int i = 0; i < size; i++) 
         {
             for (int j = 0; j < size; j++) 
             {
-                out << (i * size + j);
+                cout << (i * size + j);
                 //it is to display the link more visibly for horizontal
                 if (j != size - 1) 
                 {
-                    out << "   --   ";
+                    cout << "   --   ";
                 }
             }
-            out << endl;
+            cout << endl;
             // for vertical connections.
             if (i != size - 1) 
             {
-                out << "|" << "\t" << " |" << "\t" << "  |" << endl;
+                cout << "|" << "\t" << " |" << "\t" << "  |" << endl;
             }
         }
     }
-    
 };
 
-void saveGridToFile(int n, Grid& cityGrid) 
-{
-    ofstream outFile("project1.txt");
-    if (!outFile.is_open()) 
-    {
-        cerr << "Error: Unable to open output file." << endl;
-        exit(1);
-    }
 
-    outFile << "Grid Size: " << n << " x " << n << endl << endl;
-    outFile << "Visual Grid Layout (Node Indices):" << endl;
-    cityGrid.printVisualGrid(outFile);
-    outFile << endl;
-    outFile << "Node Connections:" << endl;
-    cityGrid.printConnections(outFile);
-
-    outFile.close();
-}
 void writeDataToFile() {
     ofstream file("project1.txt");
     int T, N, I, R, O, location, orderLocation, deliveryTimeLimit;
@@ -155,7 +175,31 @@ void writeDataToFile() {
         cin >> N >> I >> R;
         file << N << " " << I << " " << R << "\n";
 
-        /*for (int j = 0; j < R; ++j) {
+        // Create Grid here
+        int extreme = N * N;
+        if (N > extreme || N <= 0) {
+            cout << "Invalid input: Grid size must be a positive integer and within limit." << endl;
+            return;
+        }
+
+        Grid cityGrid(N);
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                int current = i * N + j;
+                if (j < N - 1) cityGrid.addEdge(current, current + 1);
+                if (i < N - 1) cityGrid.addEdge(current, current + N);
+            }
+        }
+
+        cout << "Visual Grid Layout (Node Indices):" << endl;
+        cityGrid.printVisualGrid();
+
+        cout << endl << "Node Connections:" << endl;
+        cityGrid.printAdjacencyList();
+
+
+        for (int j = 0; j < R; ++j) {
             cout << "Restaurant " << j+1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
             cin.ignore(); // Clears the input buffer
@@ -166,11 +210,11 @@ void writeDataToFile() {
             for (int k = 0; k < O; ++k) {
                 cout << "Order " << k+1 << ":" << endl;
                 cout << "Enter order name, order location, and delivery time limit: ";
-                cin >> ws; // Clears the input buffer
+                cin.ignore(); // Clears the input buffer
                 getline(cin, orderName);
                 cin >> orderLocation >> deliveryTimeLimit;
                 file << orderName << " " << orderLocation << " " << deliveryTimeLimit << "\n";
-            }*/ //some error in writing the restaurant name
+            }
         }
     }
 
@@ -179,37 +223,9 @@ void writeDataToFile() {
 }
 
 
+
 int main() 
 {
-    int n;
-    cout << "Enter the grid size (N x N): ";
-    cin >> n;
-
-    int extreme=n*n;
-    if ( n>extreme || n <= 0) {
-        cout << "Invalid input: Grid size must be a positive integer and within limit." << endl;
-        return 1;
-    }
-
-    Grid cityGrid(n);
-
-    for (int i = 0; i < n; i++) 
-    {
-        for (int j = 0; j < n; j++) 
-        {
-            int current = i * n + j;
-            if (j < n - 1) cityGrid.addEdge(current, current + 1);
-            if (i < n - 1) cityGrid.addEdge(current, current + n);
-        }
-    }
-
-    cout << "Visual Grid Layout (Node Indices):" << endl;
-    cityGrid.printVisualGrid(cout);
-
-    cout << endl << "Node Connections:" << endl;
-    cityGrid.printConnections(cout);
-
-    saveGridToFile(n, cityGrid);
 
     int choice;
     cout << "Menu:\n";
