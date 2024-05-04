@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include<string>
 using namespace std;
 
 // Logic: Grid(double pointer calling) --> GraphNode(single pointer calling) --> ListNode(Node is formed here)
@@ -118,6 +119,7 @@ public:
             }
         }
     }
+    
 };
 
 void saveGridToFile(int n, Grid& cityGrid) 
@@ -138,6 +140,44 @@ void saveGridToFile(int n, Grid& cityGrid)
 
     outFile.close();
 }
+void writeDataToFile() {
+    ofstream file("project1.txt");
+    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit;
+    string restaurantName, orderName;
+
+    cout << "Enter the number of test cases: ";
+    cin >> T;
+    file << T << "\n";
+
+    for (int i = 0; i < T; ++i) {
+        cout << "Test Case " << i+1 << ":" << endl;
+        cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
+        cin >> N >> I >> R;
+        file << N << " " << I << " " << R << "\n";
+
+        /*for (int j = 0; j < R; ++j) {
+            cout << "Restaurant " << j+1 << ":" << endl;
+            cout << "Enter restaurant name, location, and number of orders: ";
+            cin.ignore(); // Clears the input buffer
+            getline(cin, restaurantName);
+            cin >> location >> O;
+            file << restaurantName << " " << location << " " << O << "\n";
+
+            for (int k = 0; k < O; ++k) {
+                cout << "Order " << k+1 << ":" << endl;
+                cout << "Enter order name, order location, and delivery time limit: ";
+                cin >> ws; // Clears the input buffer
+                getline(cin, orderName);
+                cin >> orderLocation >> deliveryTimeLimit;
+                file << orderName << " " << orderLocation << " " << deliveryTimeLimit << "\n";
+            }*/ //some error in writing the restaurant name
+        }
+    }
+
+    file.close();
+    cout << "Data successfully written to project1.txt." << endl;
+}
+
 
 int main() 
 {
@@ -145,8 +185,9 @@ int main()
     cout << "Enter the grid size (N x N): ";
     cin >> n;
 
-    if (cin.fail() || n <= 0) {
-        cerr << "Invalid input: Grid size must be a positive integer." << endl;
+    int extreme=n*n;
+    if ( n>extreme || n <= 0) {
+        cout << "Invalid input: Grid size must be a positive integer and within limit." << endl;
         return 1;
     }
 
@@ -170,5 +211,23 @@ int main()
 
     saveGridToFile(n, cityGrid);
 
+    int choice;
+    cout << "Menu:\n";
+    cout << "1. Input Data and Write to File\n";
+    cout << "2. Exit\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    switch (choice) {
+        case 1:
+            writeDataToFile();
+            break;
+        case 2:
+            cout << "Exiting program.\n";
+            return 0;
+        default:
+            cout << "Invalid choice.\n";
+            return 1;
+    }
     return 0;
 }
