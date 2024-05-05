@@ -31,27 +31,27 @@ public:
 //                      |     node* next------------|->|     node* next---------|--->NULL
 //                      -------------------------------    ----------------------------
 //---------------------------------------------------------------------------------------------
-    
-class Queue 
+
+class Queue
 {
     ListNode* front;
     ListNode* rear;
 public:
     //constructor.
-    Queue() 
+    Queue()
     {
         front = NULL;
         rear = NULL;
     }
 
     //to add values.
-    void enqueue(int value) 
+    void enqueue(int value)
     {
         ListNode* newNode = new ListNode(value);
         newNode->id = value;
         newNode->next = NULL;
         // if there are no starting and ending nodes than  create them.
-        if ((front == NULL) && (rear == NULL)) 
+        if ((front == NULL) && (rear == NULL))
         {
             front = newNode;
             rear = newNode;
@@ -63,22 +63,22 @@ public:
     }
 
     // to delete values
-    void dequeue() 
+    void dequeue()
     {
         // list is empty.
-        if (front == NULL) 
+        if (front == NULL)
         {
             cout << "List is empty" << endl;
         }
         // if there is a front node but no end node then we create the rear node.
-        else if (front == rear) 
+        else if (front == rear)
         {
             ListNode* p = front;
             front = rear = NULL;
             delete p;
         }
         // than add next node in it.
-        else 
+        else
         {
             ListNode* p = front;
             front = front->next;
@@ -190,7 +190,7 @@ public:
             cout << endl;
         }
     }
-        // for printing the connections
+    // for printing the connections
     void printConnections()
     {
         for (int i = 0; i < size * size; i++)
@@ -207,7 +207,7 @@ public:
     }
 
 
-//   printing the entire grid.
+    //   printing the entire grid.
     void printVisualGrid()
     {
         for (int i = 0; i < size; i++)
@@ -238,17 +238,19 @@ public:
             }
         }
     }
-//Applying the Dijkstras algorithm to find the shortest path.
+    //Applying the Dijkstras algorithm to find the shortest path.
     int dijkstraShortestPath(int source, int target)
     {
         int* distance = new int[size * size];
         bool* visited = new bool[size * size];
+        int* parent = new int[size * size]; // To store parent vertices for reconstructing the path
         int time = 0; // Initialize time to 0
 
         for (int i = 0; i < size * size; ++i)
         {
             distance[i] = INT_MAX;
             visited[i] = false;
+            parent[i] = -1; // Initialize parent array
         }
 
         distance[source] = 0;
@@ -266,36 +268,49 @@ public:
 
             visited[u] = true;
 
+            if (u == target) // Stop the traversal if we reached the target vertex
+                break;
+
             for (ListNode* temp = nodes[u]->head; temp != NULL; temp = temp->next)
             {
                 int v = temp->id;
-                if (!visited[v] && distance[u] != INT_MAX && distance[u] + adjacencyList[u][v] < distance[v])
+                if (!visited[v] && distance[u] != INT_MAX && distance[u] + 1 < distance[v])
                 {
-                    distance[v] = distance[u] + adjacencyList[u][v];
+                    distance[v] = distance[u] + 1; // Since each edge weight is 1
+                    parent[v] = u; // Update parent array
                     q.enqueue(v);
-                    time++; // Increment time for each visited vertex
                 }
             }
         }
 
+        // Reconstruct the shortest path and count the number of edges along it
+        int current = target;
+        while (parent[current] != -1)
+        {
+            current = parent[current];
+            time++;
+        }
+
         delete[] distance;
         delete[] visited;
+        delete[] parent;
 
-        return time; // Return time taken
+        return time; // Return time taken (total number of connections along the shortest path)
     }
+
 };
 
-void writeDataToFile() 
+void writeDataToFile()
 {
     ofstream file("project1.txt");
-    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit, totalTime=0;
+    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit, totalTime = 0;
     string restaurantName, orderName;
 
     cout << "Enter the number of test cases: ";
     cin >> T;
     file << T << endl;
 
-    for (int i = 0; i < T; ++i) 
+    for (int i = 0; i < T; ++i)
     {
         cout << "Test Case " << i + 1 << ":" << endl;
         cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
@@ -303,7 +318,7 @@ void writeDataToFile()
         file << N << " " << I << " " << R << endl;
 
         int extreme = N * N;
-        if (N > extreme || N <= 0) 
+        if (N > extreme || N <= 0)
         {
             cout << "Invalid input: Grid size must be a positive integer and within limit." << endl;
             return;
@@ -311,9 +326,9 @@ void writeDataToFile()
 
         Grid cityGrid(N);
 
-        for (int i = 0; i < N; i++) 
+        for (int i = 0; i < N; i++)
         {
-            for (int j = 0; j < N; j++) 
+            for (int j = 0; j < N; j++)
             {
                 int current = i * N + j;
                 if (j < N - 1) cityGrid.addEdge(current, current + 1);
@@ -324,7 +339,7 @@ void writeDataToFile()
         cityGrid.printConnections();
 
 
-        for (int j = 0; j < R; ++j) 
+        for (int j = 0; j < R; ++j)
         {
             cout << "Restaurant " << j + 1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
@@ -333,7 +348,7 @@ void writeDataToFile()
             cin >> location >> O;
             file << restaurantName << " " << location << " " << O << endl;
 
-            for (int k = 0; k < O; ++k) 
+            for (int k = 0; k < O; k++)
             {
                 cout << "Order " << k + 1 << ":" << endl;
                 cout << "Enter order name, order location, and delivery time limit: ";
@@ -354,25 +369,26 @@ void writeDataToFile()
     file.close();
     cout << "Data successfully written to project1.txt." << endl;
 }
+
 int main()
 {
     int choice;
     cout << "Menu:" << endl;
-    cout << "1. Input Data and Write to File"<<endl;
-    cout << "2. Exit"<<endl;
+    cout << "1. Input Data and Write to File" << endl;
+    cout << "2. Exit" << endl;
     cout << "Enter your choice: ";
     cin >> choice;
 
-    switch (choice) 
+    switch (choice)
     {
     case 1:
         writeDataToFile();
         break;
     case 2:
-        cout << "Exiting program."<<endl;
+        cout << "Exiting program." << endl;
         return 0;
     default:
-        cout << "Invalid choice."<<endl;
+        cout << "Invalid choice." << endl;
         return 1;
     }
     return 0;
