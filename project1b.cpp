@@ -1,68 +1,78 @@
 #include <iostream>
 #include <fstream>
-#include<string>
+#include <string>
+#include <climits>
+#include <limits> 
+#include <chrono>
+using namespace std::chrono;
 using namespace std;
 
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
-class ListNode
-{
+
+class ListNode {
 public:
     int id;
     ListNode* next;
-    ListNode(int nodeId) : id(nodeId), next(NULL) {}// MIL(Member List Initialization.)
+    ListNode(int nodeId) : id(nodeId), next(NULL) {}// MIL(Member Initialization List.) 
 };
 
 //---------------------------------------------------------------------------------------------
 //---------------------------------------------QUEUE--------------------------------------
 //                      ___________________    _________________ 
-//                      |     data (int)                    |    |     data (int)               |
-//front -------->|     aerial_root (bool)      |    |     aerial_root (bool) |  <------------  rear
+//                      |     id (int) (vertex)          |    |     id (int)(vertex)      |
+//front -------->|                                        |    |                                   |  <------------  rear
 //                      |     node* next------------|->|     node* next---------|--->NULL
 //                      -------------------------------    ----------------------------
 //---------------------------------------------------------------------------------------------
-
-class Queue
+    
+class Queue 
 {
     ListNode* front;
     ListNode* rear;
 public:
-    Queue()
+    //constructor.
+    Queue() 
     {
         front = NULL;
         rear = NULL;
     }
 
-    void enqueue(int value)
+    //to add values.
+    void enqueue(int value) 
     {
         ListNode* newNode = new ListNode(value);
         newNode->id = value;
         newNode->next = NULL;
-        if ((front == NULL) && (rear == NULL))
+        // if there are no starting and ending nodes than  create them.
+        if ((front == NULL) && (rear == NULL)) 
         {
             front = newNode;
             rear = newNode;
         }
-        else
-        {
+        else {
             rear->next = newNode;
             rear = newNode;
         }
     }
 
-    void dequeue()
+    // to delete values
+    void dequeue() 
     {
-        if (front == NULL)
+        // list is empty.
+        if (front == NULL) 
         {
             cout << "List is empty" << endl;
         }
-        else if (front == rear)
+        // if there is a front node but no end node then we create the rear node.
+        else if (front == rear) 
         {
             ListNode* p = front;
             front = rear = NULL;
             delete p;
         }
-        else
+        // than add next node in it.
+        else 
         {
             ListNode* p = front;
             front = front->next;
@@ -70,21 +80,14 @@ public:
         }
     }
 
-    int Front()
-    {
+    // the vertex value will be stored in front data as it helps in graph traversal understanding
+    int Front() {
         return front->id;
     }
 
-    bool isEmpty()
-    {
-        if (front == NULL)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+    //if no front node is made then it will return null.
+    bool isEmpty() {
+        return (front == NULL);
     }
 };
 
@@ -94,9 +97,10 @@ class GraphNode
 public:
     int id;
     ListNode* head;
+    // parameterized constructor.
+    GraphNode(int nodeId) : id(nodeId), head(NULL) {} //MIL (Member Initialization List).
 
-    GraphNode(int nodeId) : id(nodeId), head(NULL) {}
-
+    // to add the values to each edge that attaches vertex.
     void addEdge(int to)
     {
         ListNode* newNode = new ListNode(to);
@@ -104,6 +108,7 @@ public:
         head = newNode;
     }
 
+    //Destructor.
     ~GraphNode()
     {
         ListNode* current = head;
@@ -123,7 +128,7 @@ public:
     int size;
     GraphNode** nodes;
     int** adjacencyList;
-
+    // parameterized constructor to ensure that memory is allocated for the size user asked for
     Grid(int n) : size(n)
     {
         nodes = new GraphNode * [n * n];
@@ -139,6 +144,7 @@ public:
         }
     }
 
+    //Destructor. to avoid memory leaks
     ~Grid()
     {
         for (int i = 0; i < size * size; i++)
@@ -150,6 +156,7 @@ public:
         delete[] adjacencyList;
     }
 
+    // it adds edges to make connections in adjacency list.
     void addEdge(int from, int to)
     {
         if (from >= 0 && from < size * size && to >= 0 && to < size * size)
@@ -160,7 +167,7 @@ public:
             adjacencyList[to][from] = 1;
         }
     }
-
+    // it prints the Adjacency list.
     void printAdjacencyList()
     {
         cout << "Adjacency List:" << endl;
@@ -177,7 +184,7 @@ public:
             cout << endl;
         }
     }
-
+        // for printing the connections
     void printConnections()
     {
         for (int i = 0; i < size * size; i++)
@@ -193,6 +200,8 @@ public:
         }
     }
 
+
+//   printing the entire grid.
     void printVisualGrid()
     {
         for (int i = 0; i < size; i++)
@@ -223,13 +232,13 @@ public:
             }
         }
     }
-
-    void dijkstraShortestPath(int source, int target)
+//Applying the Dijkstras algorithm to find the shortest path.
+    void dijkstraShortestPath(int source, int target) 
     {
         int* distance = new int[size * size];
         bool* visited = new bool[size * size];
 
-        for (int i = 0; i < size * size; ++i)
+        for (int i = 0; i < size * size; ++i) 
         {
             distance[i] = INT_MAX;
             visited[i] = false;
@@ -238,11 +247,13 @@ public:
         distance[source] = 0;
 
         Queue q;
+        // it adds discovered nodes to the queue
         q.enqueue(source);
 
-        while (!q.isEmpty())
+        while (!q.isEmpty()) 
         {
             int u = q.Front();
+            // it removes the 
             q.dequeue();
 
             if (visited[u])
@@ -250,10 +261,10 @@ public:
 
             visited[u] = true;
 
-            for (ListNode* temp = nodes[u]->head; temp != NULL; temp = temp->next)
+            for (ListNode* temp = nodes[u]->head; temp != NULL; temp = temp->next) 
             {
                 int v = temp->id;
-                if (!visited[v] && distance[u] != INT_MAX && distance[u] + adjacencyList[u][v] < distance[v])
+                if (!visited[v] && distance[u] != INT_MAX && distance[u] + adjacencyList[u][v] < distance[v]) 
                 {
                     distance[v] = distance[u] + adjacencyList[u][v];
                     q.enqueue(v);
@@ -262,7 +273,7 @@ public:
         }
 
         cout << "Shortest distances from source node " << source << ":" << endl;
-        for (int i = 0; i < size * size; ++i)
+        for (int i = 0; i < size * size; ++i) 
         {
             cout << "Node " << i << ": " << distance[i] << endl;
         }
@@ -272,17 +283,17 @@ public:
     }
 };
 
-void writeDataToFile()
+void writeDataToFile() 
 {
     ofstream file("project1.txt");
-    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit;
+    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit, totalTime;
     string restaurantName, orderName;
 
     cout << "Enter the number of test cases: ";
     cin >> T;
     file << T << endl;
 
-    for (int i = 0; i < T; ++i)
+    for (int i = 0; i < T; ++i) 
     {
         cout << "Test Case " << i + 1 << ":" << endl;
         cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
@@ -290,7 +301,7 @@ void writeDataToFile()
         file << N << " " << I << " " << R << endl;
 
         int extreme = N * N;
-        if (N > extreme || N <= 0)
+        if (N > extreme || N <= 0) 
         {
             cout << "Invalid input: Grid size must be a positive integer and within limit." << endl;
             return;
@@ -298,17 +309,20 @@ void writeDataToFile()
 
         Grid cityGrid(N);
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < N; i++) 
         {
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j < N; j++) 
             {
                 int current = i * N + j;
                 if (j < N - 1) cityGrid.addEdge(current, current + 1);
                 if (i < N - 1) cityGrid.addEdge(current, current + N);
             }
         }
+        cityGrid.printVisualGrid();
+        cityGrid.printConnections();
 
-        for (int j = 0; j < R; ++j)
+
+        for (int j = 0; j < R; ++j) 
         {
             cout << "Restaurant " << j + 1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
@@ -317,7 +331,7 @@ void writeDataToFile()
             cin >> location >> O;
             file << restaurantName << " " << location << " " << O << endl;
 
-            for (int k = 0; k < O; ++k)
+            for (int k = 0; k < O; ++k) 
             {
                 cout << "Order " << k + 1 << ":" << endl;
                 cout << "Enter order name, order location, and delivery time limit: ";
@@ -327,21 +341,30 @@ void writeDataToFile()
                 file << orderName << " " << orderLocation << " " << deliveryTimeLimit << endl;
             }
         }
+        cout << "Running Dijkstra's algorithm..." << endl;
+        // Assuming the last location and order location are needed for Dijkstra's algorithm
+        auto start = high_resolution_clock::now();
+        cityGrid.dijkstraShortestPath(location, orderLocation);
+        auto stop = high_resolution_clock::now();
+        file << "Data successfully processed for test case " << i + 1 << endl;
+        auto duration = duration_cast<microseconds>(stop - start);
+
+        // To get the value of duration use the count()
+        // member function on the duration object
+        cout << "Total microseconds taken to execute Dijkastra's Algorithm are: " << endl;
+        cout << duration.count() << endl;
+
     }
 
-    cout << "Running Dijkstra's algorithm..." << endl;
-    // Assuming the last location and order location are needed for Dijkstra's algorithm
-    cityGrid.dijkstraShortestPath(location, orderLocation);
     file.close();
     cout << "Data successfully written to project1.txt." << endl;
 }
-
 int main()
 {
     int choice;
-    cout << "Menu:\n";
-    cout << "1. Input Data and Write to File\n";
-    cout << "2. Exit\n";
+    cout << "Menu:" << endl;
+    cout << "1. Input Data and Write to File"<<endl;
+    cout << "2. Exit"<<endl;
     cout << "Enter your choice: ";
     cin >> choice;
 
@@ -351,10 +374,10 @@ int main()
         writeDataToFile();
         break;
     case 2:
-        cout << "Exiting program.\n";
+        cout << "Exiting program."<<endl;
         return 0;
     default:
-        cout << "Invalid choice.\n";
+        cout << "Invalid choice."<<endl;
         return 1;
     }
     return 0;
