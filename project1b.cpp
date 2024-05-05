@@ -3,13 +3,19 @@
 #include <string>
 #include <climits>
 #include <limits> 
-#include <chrono>
-using namespace std::chrono;
 using namespace std;
 
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
 
+//--------------------------------------------------------------------------------
+//-----------------------------LINKED LIST---------------------------------
+//      node1:                                                node2:
+//      _________________   __________________________ 
+//      |     id (int)                   |    |     id (int)                   |
+//      |      (vertex value)      |    |     (vertex value)        |
+//      |     node* next--------|->|     node* next---------|--->NULL
+//      --------------------------      --------------------------
 class ListNode {
 public:
     int id;
@@ -233,12 +239,13 @@ public:
         }
     }
 //Applying the Dijkstras algorithm to find the shortest path.
-    void dijkstraShortestPath(int source, int target) 
+    int dijkstraShortestPath(int source, int target)
     {
         int* distance = new int[size * size];
         bool* visited = new bool[size * size];
+        int time = 0; // Initialize time to 0
 
-        for (int i = 0; i < size * size; ++i) 
+        for (int i = 0; i < size * size; ++i)
         {
             distance[i] = INT_MAX;
             visited[i] = false;
@@ -247,13 +254,11 @@ public:
         distance[source] = 0;
 
         Queue q;
-        // it adds discovered nodes to the queue
         q.enqueue(source);
 
-        while (!q.isEmpty()) 
+        while (!q.isEmpty())
         {
             int u = q.Front();
-            // it removes the 
             q.dequeue();
 
             if (visited[u])
@@ -261,32 +266,29 @@ public:
 
             visited[u] = true;
 
-            for (ListNode* temp = nodes[u]->head; temp != NULL; temp = temp->next) 
+            for (ListNode* temp = nodes[u]->head; temp != NULL; temp = temp->next)
             {
                 int v = temp->id;
-                if (!visited[v] && distance[u] != INT_MAX && distance[u] + adjacencyList[u][v] < distance[v]) 
+                if (!visited[v] && distance[u] != INT_MAX && distance[u] + adjacencyList[u][v] < distance[v])
                 {
                     distance[v] = distance[u] + adjacencyList[u][v];
                     q.enqueue(v);
+                    time++; // Increment time for each visited vertex
                 }
             }
         }
 
-        cout << "Shortest distances from source node " << source << ":" << endl;
-        for (int i = 0; i < size * size; ++i) 
-        {
-            cout << "Node " << i << ": " << distance[i] << endl;
-        }
-
         delete[] distance;
         delete[] visited;
+
+        return time; // Return time taken
     }
 };
 
 void writeDataToFile() 
 {
     ofstream file("project1.txt");
-    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit, totalTime;
+    int T, N, I, R, O, location, orderLocation, deliveryTimeLimit, totalTime=0;
     string restaurantName, orderName;
 
     cout << "Enter the number of test cases: ";
@@ -343,19 +345,12 @@ void writeDataToFile()
         }
         cout << "Running Dijkstra's algorithm..." << endl;
         // Assuming the last location and order location are needed for Dijkstra's algorithm
-        auto start = high_resolution_clock::now();
-        cityGrid.dijkstraShortestPath(location, orderLocation);
-        auto stop = high_resolution_clock::now();
-        file << "Data successfully processed for test case " << i + 1 << endl;
-        auto duration = duration_cast<microseconds>(stop - start);
-
-        // To get the value of duration use the count()
-        // member function on the duration object
-        cout << "Total microseconds taken to execute Dijkastra's Algorithm are: " << endl;
-        cout << duration.count() << endl;
+        int timePerOrder = cityGrid.dijkstraShortestPath(location, orderLocation); // Get time taken per order
+        totalTime += timePerOrder; // Accumulate time for each test case
+        cout << "Total time taken to reach destination for test case " << i + 1 << ": " << timePerOrder << endl;
 
     }
-
+    cout << "Total time taken for all test cases: " << totalTime << endl;
     file.close();
     cout << "Data successfully written to project1.txt." << endl;
 }
