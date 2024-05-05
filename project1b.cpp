@@ -8,7 +8,6 @@ using namespace std;
 //Implement Dijkstra's Algorithm: Write a function to implement Dijkstra's algorithm to find the shortest path from a given source node to all other nodes in the grid.
 //Modify Grid Class : Add a method to get the shortest path from a source node to a destination node based on the output of Dijkstra's algorithm.
 //Update Main Function : Call the Dijkstra function to find the shortest path, and then print or save the shortest path to the output file.
-
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
 class ListNode
@@ -48,7 +47,6 @@ public:
         }
     }
 };
-
 class Grid
 {
 public:
@@ -100,6 +98,8 @@ public:
             adjacencyList[to][from] = 1;
         }
     }
+
+    
 
     // Print adjacency list (for debugging)
     void printAdjacencyList()
@@ -170,9 +170,8 @@ public:
         }
     }
 };
-
-
-void writeDataToFile() {
+void writeDataToFile() 
+{
     ofstream file("project1.txt");
     int T, N, I, R, O, location, orderLocation, deliveryTimeLimit;
     string restaurantName, orderName;
@@ -181,7 +180,8 @@ void writeDataToFile() {
     cin >> T;
     file << T << "\n";
 
-    for (int i = 0; i < T; ++i) {
+    for (int i = 0; i < T; ++i) 
+    {
         cout << "Test Case " << i + 1 << ":" << endl;
         cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
         cin >> N >> I >> R;
@@ -211,7 +211,8 @@ void writeDataToFile() {
         cityGrid.printAdjacencyList();
 
 
-        for (int j = 0; j < R; ++j) {
+        for (int j = 0; j < R; ++j) 
+        {
             cout << "Restaurant " << j + 1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
             cin.ignore(); // Clears the input buffer
@@ -234,6 +235,140 @@ void writeDataToFile() {
     cout << "Data successfully written to project1.txt." << endl;
 }
 
+//---------------------------------------------------------------------------------------------
+//---------------------------------------------QUEUE-------------------------------------------
+//               __________________________    __________________________ 
+//               |     data (int)         |    |     data (int)         |
+//  front -----> |     aerial_root (bool) |    |     aerial_root (bool) |  <------------  rear
+//               |     node* next---------|--->|     node* next---------|--->NULL
+//               --------------------------    --------------------------
+class Queue {
+    ListNode* front;
+    ListNode* rear;
+public:
+    Queue() 
+    {
+        front = NULL;
+        rear = NULL;
+    }
+    // enqueue () Inserts the element at the rear of the queue.
+    void enqueue(int value) {
+        ListNode* newNode = new ListNode(value);
+        newNode->id = value;
+        newNode->next = NULL;
+        if ((front == NULL) && (rear == NULL)) 
+        {
+            front = newNode;
+            rear = newNode;
+        }
+        else 
+        {
+            rear->next = newNode;
+            rear = newNode;
+        }
+    }
+    void dequeue() 
+    {
+        if (front == NULL) 
+        {
+            cout << "List is empty" << endl;
+        }
+        else if (front == rear) 
+        {
+            ListNode* p = front;
+            front = rear = NULL;
+            delete p;
+        }
+        else 
+        {
+            ListNode* p = front;
+            front = front->next;
+            delete p;
+        }
+    }
+    //Front() Returns the value of the element at front of the queue.
+    int Front() 
+    {
+        return front->id;
+    }
+    //isEmpty () Returns True if the queue is empty else returns False.
+    bool isEmpty() 
+    {
+        if (front == NULL) 
+        {
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
+    }
+};
+class Dijkstra_algorithm
+{
+public:
+    int size;
+    int** adjacencyMatrix;
+    int source;
+
+    Dijkstra_algorithm(int n, int** adjMatrix)
+    {
+        size = n;
+        adjacencyMatrix = adjMatrix;
+        source = 0; // Default source node
+    }
+
+    // Function to implement Dijkstra's algorithm
+    void dijkstraShortestPath()
+    {
+        // Create arrays for distances and visited nodes
+        int* distance = new int[size];
+        bool* visited = new bool[size];
+
+        // Initialize distances and visited arrays
+        for (int i = 0; i < size; ++i) {
+            distance[i] = INT_MAX;
+            visited[i] = false;
+        }
+
+        // Distance of source node from itself is always 0
+        distance[source] = 0;
+
+        // Main loop of Dijkstra's algorithm
+        for (int i = 0; i < size - 1; ++i) {
+            // Find the vertex with minimum distance
+            int minDistance = INT_MAX;
+            int minIndex;
+            for (int j = 0; j < size; ++j) {
+                if (!visited[j] && distance[j] <= minDistance) {
+                    minDistance = distance[j];
+                    minIndex = j;
+                }
+            }
+
+            // Mark the selected vertex as visited
+            visited[minIndex] = true;
+
+            // Update distance values of adjacent vertices
+            for (int k = 0; k < size; ++k) {
+                if (!visited[k] && adjacencyMatrix[minIndex][k] && distance[minIndex] != INT_MAX &&
+                    distance[minIndex] + adjacencyMatrix[minIndex][k] < distance[k]) {
+                    distance[k] = distance[minIndex] + adjacencyMatrix[minIndex][k];
+                }
+            }
+        }
+
+        // Print the shortest distances from source node to all other nodes
+        cout << "Shortest distances from source node " << source << ":" << endl;
+        for (int i = 0; i < size; ++i) {
+            cout << "Node " << i << ": " << distance[i] << endl;
+        }
+
+        // Free memory
+        delete[] distance;
+        delete[] visited;
+    }
+};
 
 
 int main()
@@ -249,6 +384,9 @@ int main()
     switch (choice) {
     case 1:
         writeDataToFile();
+        // Create Dijkstra_algorithm object and run Dijkstra's algorithm
+        /*Dijkstra_algorithm dijkstra(size, adjacencyMatrix);
+        dijkstra.dijkstraShortestPath();*/
         break;
     case 2:
         cout << "Exiting program.\n";
@@ -259,3 +397,4 @@ int main()
     }
     return 0;
 }
+
