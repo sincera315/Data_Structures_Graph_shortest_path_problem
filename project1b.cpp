@@ -8,6 +8,7 @@ using namespace std;
 //Implement Dijkstra's Algorithm: Write a function to implement Dijkstra's algorithm to find the shortest path from a given source node to all other nodes in the grid.
 //Modify Grid Class : Add a method to get the shortest path from a source node to a destination node based on the output of Dijkstra's algorithm.
 //Update Main Function : Call the Dijkstra function to find the shortest path, and then print or save the shortest path to the output file.
+
 // it creates nodes to form linked list which will further be used to connect nodes to indexes of arrays to create an
 // adjacency list. Here nodeid creates a unique id for each time to works.
 class ListNode
@@ -47,6 +48,7 @@ public:
         }
     }
 };
+
 class Grid
 {
 public:
@@ -99,8 +101,6 @@ public:
         }
     }
 
-    
-
     // Print adjacency list (for debugging)
     void printAdjacencyList()
     {
@@ -146,16 +146,16 @@ public:
                 //it is to display the link more visibly for horizontal
                 if (j != size - 1)
                 {
-                    if (j > 9)
+                    if (j > 9) 
                     {
                         cout << "--";
                     }
-                    else 
+                    else
                     {
                         cout << "   --   ";
                     }
+                  
                 }
-                
             }
             cout << endl;
             // for vertical connections.
@@ -163,15 +163,16 @@ public:
             {
                 for (int k = 0; k < size; k++)
                 {
-                    cout << "|" << "\t";
+                    cout << "|" << "\t ";
                 }
-                cout << endl;
+                cout<< endl;
             }
         }
     }
 };
-void writeDataToFile() 
-{
+
+
+void writeDataToFile() {
     ofstream file("project1.txt");
     int T, N, I, R, O, location, orderLocation, deliveryTimeLimit;
     string restaurantName, orderName;
@@ -180,8 +181,7 @@ void writeDataToFile()
     cin >> T;
     file << T << "\n";
 
-    for (int i = 0; i < T; ++i) 
-    {
+    for (int i = 0; i < T; ++i) {
         cout << "Test Case " << i + 1 << ":" << endl;
         cout << "Enter grid size (N), number of riders (I), and number of restaurants (R): ";
         cin >> N >> I >> R;
@@ -211,8 +211,7 @@ void writeDataToFile()
         cityGrid.printAdjacencyList();
 
 
-        for (int j = 0; j < R; ++j) 
-        {
+        for (int j = 0; j < R; ++j) {
             cout << "Restaurant " << j + 1 << ":" << endl;
             cout << "Enter restaurant name, location, and number of orders: ";
             cin.ignore(); // Clears the input buffer
@@ -235,13 +234,18 @@ void writeDataToFile()
     cout << "Data successfully written to project1.txt." << endl;
 }
 
+
+
 //---------------------------------------------------------------------------------------------
-//---------------------------------------------QUEUE-------------------------------------------
-//               __________________________    __________________________ 
-//               |     data (int)         |    |     data (int)         |
-//  front -----> |     aerial_root (bool) |    |     aerial_root (bool) |  <------------  rear
-//               |     node* next---------|--->|     node* next---------|--->NULL
-//               --------------------------    --------------------------
+//---------------------------------------------QUEUE--------------------------------------
+//                      ___________________    _________________ 
+//                      |     data (int)                    |    |     data (int)               |
+//front -------->|     aerial_root (bool)      |    |     aerial_root (bool) |  <------------  rear
+//                      |     node* next------------|->|     node* next---------|--->NULL
+//                      -------------------------------    ----------------------------
+
+
+
 class Queue {
     ListNode* front;
     ListNode* rear;
